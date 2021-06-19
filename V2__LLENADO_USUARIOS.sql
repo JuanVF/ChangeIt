@@ -1,5 +1,8 @@
 USE ChangeIt;
 
+INSERT INTO dbo.Gender (gender) VALUES ('Male'), ('Female');
+INSERT INTO dbo.SocialMedia (name) VALUES ('Facebook'), ('Instagram'), ('Twitter'), ('Google');
+
 DROP PROCEDURE IF EXISTS sp_fill_users;
 
 CREATE PROCEDURE sp_fill_users
@@ -26,6 +29,9 @@ BEGIN
 	DECLARE @enabled BIT;
 
 	DECLARE @ImageId BIGINT;
+	DECLARE @idUser BIGINT
+	DECLARE @Id_user_sesion VARCHAR(256)
+	DECLARE @idSocialMedia int 
 
 	INSERT INTO @Usuarios
 		(name, lastName, birthday, urlPP, idGender, email, enabled)
@@ -49,9 +55,15 @@ BEGIN
 		FROM @Usuarios
 		ORDER BY newid();
 
+		SELECT TOP 1
+			@idSocialMedia = idSocialMedia
+		FROM dbo.SocialMedia
+		ORDER BY newid();
+
 		SET @name = CONVERT(NVARCHAR(70), CONCAT(@name, floor(999999*rand())));
 		SET @lastName = CONVERT(NVARCHAR(70), CONCAT(@lastName, floor(999999*rand())));
-		
+		SET @Id_user_sesion = CONCAT(@name, @lastName, floor(999999*rand()));
+
 		INSERT INTO dbo.Images
 			(link)
 		VALUES
@@ -64,10 +76,17 @@ BEGIN
 		VALUES 
 			(@name, @lastName, @birthday, @ImageId, @idGender, @email, @enabled);
 
+		SET @idUser = @@IDENTITY;
+
+		INSERT INTO dbo.InfoPerSocialMedia
+			(idUser, idSocialMedia, id_user)
+		VALUES 
+			(@idUser, @idSocialMedia, @Id_user_sesion);
+
 		SET @cantidad = @cantidad - 1;
 	END;
 END;
 
 exec sp_fill_users 100000;
 
-SELECT * FROM dbo.Users;
+SELECT * FROM dbo.InfoPerSocialMedia
