@@ -15,7 +15,7 @@ CREATE PROCEDURE sp_register_post
 	@description NVARCHAR(148),
 	@user_id_rs VARCHAR(256),
 	@post_type VARCHAR(70),
-	@post_time DATETIME,
+	@post_time VARCHAR(70),
 	@linkAction VARCHAR(512)
 AS
 BEGIN
@@ -44,7 +44,7 @@ BEGIN
 	INSERT INTO dbo.Posts
 		(idSocialMedia, link, description, idUser, idPostType, postTime, linkAction)
 	VALUES
-		(@SocialMediaId, @link, @description, @idUser, @idPostType, @post_time, @linkAction);
+		(@SocialMediaId, @link, @description, @idUser, @idPostType, CAST(@post_time AS DATETIME), @linkAction);
 END;
 
 DROP PROCEDURE IF EXISTS sp_get_post;
@@ -59,8 +59,7 @@ BEGIN
 		description,
 		postTime,
 		linkAction
-	FROM dbo.Posts
-	ORDER BY newid();
+	FROM dbo.Posts;
 END;
 
 CREATE PROCEDURE sp_register_habit_post

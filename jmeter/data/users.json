@@ -1,0 +1,2 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1624174524040,919,Request users,200,OK,User Request Group 1-1,text,true,,222086,126,1,1,http://localhost:5000/api/users/5000,918,0,1
