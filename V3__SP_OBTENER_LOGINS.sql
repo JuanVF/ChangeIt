@@ -8,8 +8,6 @@ CREATE PROCEDURE sp_get_logins
 	@Cantidad INT
 AS
 BEGIN 
-	-- Lo ponemos dentro de un select interno porque es mas
-	-- eficiente ordenar la cantidad N, a ordenar y luego obtener los N
 	SELECT TOP (@Cantidad)
 		id_user
 	FROM dbo.InfoPerSocialMedia
