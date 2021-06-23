@@ -151,6 +151,9 @@ BEGIN
 	FETCH NEXT FROM sponsorsInfo INTO @cursor_idSponsor, @cursor_amount;
 	END
 
+	CLOSE sponsorsInfo;
+	DEALLOCATE sponsorsInfo;
+
 	-- Inicializamos el checksum
 	SET @checksum = HASHBYTES('SHA2_256', CONCAT(
 		@postTime, 
@@ -216,6 +219,6 @@ BEGIN
 		ROLLBACK;
 		SELECT   
 			ERROR_NUMBER() AS ErrorNumber  
-		   ,ERROR_MESSAGE() AS ErrorMessage;  
+		   ,ERROR_MESSAGE() AS ErrorMessage;
 	END CATCH
 END;

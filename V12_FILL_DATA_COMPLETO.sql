@@ -108,7 +108,7 @@ END;
 -- Store procedure para insertar pagos de habitos
 DROP PROCEDURE IF EXISTS fill_habit_payment;
 
-exec fill_habit_payment 10000
+exec fill_habit_payment 2000
 
 SELECT * FROM dbo.PaymentAttempts;
 
@@ -230,6 +230,15 @@ BEGIN
 END;
 
 -- Fill data para pago de sponsors
+-- Este fill data tiene un porcentaje de error, pues, se basa en asumir
+-- que en un rango de fechas existe un post, sin embargo, no necesariamente lo hace
+DROP PROCEDURE IF EXISTS sp_fill_sponsors_payment;
+
+exec sp_fill_sponsors_payment 500;
+
+SELECT * FROM dbo.SponsorsPayment;
+DELETE FROM dbo.PaymentFromAd;
+DELETE FROM dbo.SponsorsPayment;
 
 CREATE PROCEDURE sp_fill_sponsors_payment 
 	@Cantidad INT
@@ -241,6 +250,27 @@ BEGIN
 		computerName VARCHAR(148),
 		ipAddress VARCHAR(14)
 	);
+	DECLARE @amount DECIMAL(10, 2);
+	DECLARE @Max BIGINT;
+	DECLARE @Min BIGINT;
+	DECLARE @desc NVARCHAR(148);
+	DECLARE @computerName VARCHAR(148);
+	DECLARE @ipAddress VARCHAR(14);
+	DECLARE @merchantName VARCHAR(148);
+	DECLARE @paymentStatus VARCHAR(148);
+	DECLARE @transactionSubType VARCHAR(148);
+	DECLARE @username VARCHAR(256);
+	DECLARE @postLink VARCHAR(512);
+	DECLARE @startSponsor DATETIME;
+	DECLARE @endSponsor DATETIME;
+	DECLARE @FromDate date = '2015-01-01';
+	DECLARE @ToDate date = '2019-12-31';
+	DECLARE @postId BIGINT;
+	DECLARE @locationName NVARCHAR(148);
+	DECLARE @locationCountry NVARCHAR(148);
+	DECLARE @habitName NVARCHAR(148);
+	-- Aqui estamos diciendo que ChangeIt se va a llevar 20%
+	DECLARE @ChangeItPercentage DECIMAL(5, 2) = 20.0;
 
 	INSERT INTO @RandData
 		(description,computerName,ipAddress)
@@ -254,6 +284,74 @@ BEGIN
 
 	WHILE @Cantidad > 0
 	BEGIN
-		
-	END
-END
+		-- Generamos un amount entre los 1k a 5k dolares
+		-- O sea, esto genero un sponsor
+		SET @amount = RAND() * (5000 - 1000) + 1000;
+
+		-- Seleccionamos un info de pago aleatoria
+		SELECT
+			@desc = description,
+			@computerName = computerName,
+			@ipAddress = ipAddress
+		FROM @RandData
+		ORDER BY NEWID();
+
+		-- Datos extras aleatorios para los pagos
+		SELECT TOP 1
+			@merchantName = name
+		FROM dbo.Merchants
+		ORDER BY NEWID();
+
+		SELECT TOP 1
+			@paymentStatus = status
+		FROM dbo.PaymentStatus
+		ORDER BY NEWID();
+
+		SELECT TOP 1
+			@transactionSubType = name
+		FROM dbo.TransactionSubTypes
+		ORDER BY NEWID();		
+
+		-- Obtenemos un usuario aleatorio
+		SELECT TOP 1
+			@userName = id_user
+		FROM dbo.InfoPerSocialMedia
+		ORDER BY NEWID();
+
+		-- Obtenemos fechas aleatorias (coherentes con la progra) para obtener un post
+		SELECT @startSponsor = CAST(dateadd(day, 
+					   rand(checksum(newid()))*(1+datediff(day, @FromDate, @ToDate)), 
+					   @FromDate) AS DATETIME)
+
+		SELECT @endSponsor = CAST(dateadd(day, 
+					   rand(checksum(newid()))*(1+datediff(day, CAST(@startSponsor AS DATE), @ToDate)), 
+					   @FromDate) AS DATETIME);
+
+		-- Obtenemos un post aleatorio que se encuentre en esas fechas
+		SELECT TOP 1
+			@postId = idPost,
+			@postLink = link
+		FROM dbo.Posts
+		WHERE dbo.Posts.postTime BETWEEN @startSponsor AND @endSponsor;
+
+		-- Seleccionamos un habito que tenga ese post
+		SELECT TOP 1
+			@locationName = dbo.Locations.name,
+			@locationCountry = dbo.Locations.country,
+			@habitName = dbo.Habit.title
+		FROM dbo.HabitsPerPosts
+		INNER JOIN dbo.LocationsPerHabit
+			ON dbo.HabitsPerPosts.idLocationPerHabit = dbo.LocationsPerHabit.idLocationsPerHabit
+		INNER JOIN dbo.Habit
+			ON dbo.Habit.idHabit = dbo.LocationsPerHabit.idHabit
+		INNER JOIN dbo.Locations
+			ON dbo.Locations.idLocation = dbo.LocationsPerHabit.idLocation
+		WHERE idPost = @postId;
+
+		EXEC sp_register_ad_payment @amount, 2, @desc, 1, 0, @computerName, @username, @ipAddress, @merchantName,
+			@paymentStatus, @transactionSubType, @postLink, @startSponsor, @endSponsor, @habitName, @locationCountry,
+			@locationName, @ChangeItPercentage; 
+
+		SET @Cantidad = @Cantidad - 1;
+	END;
+END;
