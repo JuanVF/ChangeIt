@@ -151,9 +151,9 @@ BEGIN
 
 			-- Insertamos el sponsor que hace el pago
 			INSERT INTO dbo.Sponsors
-				(idLocationsPerHabit, radius, idUser, startSponsor, endSponsor)
+				(idLocationsPerHabit, radius, idUser, startSponsor, endSponsor, amount)
 			VALUES
-				(@idLocationPerHabit, @radius, @userId, @startSponsor, @endSponsor);
+				(@idLocationPerHabit, @radius, @userId, @startSponsor, @endSponsor, @amount);
 
 			SET @SponsorId = @@IDENTITY;
 

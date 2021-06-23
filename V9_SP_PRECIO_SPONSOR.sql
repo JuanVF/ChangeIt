@@ -4,7 +4,11 @@ USE ChangeIt;
 DECLARE @spt DATETIME = CAST('2015-09-06 00:00:00.000' AS DATETIME)
 DECLARE @ept DATETIME = CAST('2015-10-06 00:00:00.000' AS DATETIME)
 
-exec sp_get_price_habit 'Usar energia solar26693431', 'US', 'SONIC Drive In', @spt, @ept
+DECLARE @price DECIMAL(10, 2)
+
+exec sp_get_price_habit 'Usar energia solar26693431', 'US', 'SONIC Drive In', @spt, @ept, @amount_rst = @price OUTPUT
+
+SELECT @price
 
 DROP PROCEDURE IF EXISTS sp_get_price_habit;
 
@@ -13,7 +17,8 @@ CREATE PROCEDURE sp_get_price_habit
 	@country NVARCHAR(148),
 	@locationName NVARCHAR(148),
 	@startDate DATETIME,
-	@endDate DATETIME
+	@endDate DATETIME,
+	@amount_rst DECIMAL(10, 2) OUTPUT
 AS
 BEGIN 
 	DECLARE @HabitId BIGINT;
@@ -53,9 +58,9 @@ BEGIN
 
 	IF @count = 0
 		SELECT 
-			price
+			@amount_rst = price
 		FROM dbo.Prices
 		WHERE dbo.Prices.idLocationPerHabit = @LocationPerHabitId
 	ELSE
-		SELECT @amount / @count AS price;
+		SET @amount_rst = @amount / @count;
 END;
