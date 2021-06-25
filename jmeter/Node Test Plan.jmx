@@ -472,7 +472,7 @@
         </HTTPSamplerProxy>
         <hashTree>
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Posts" enabled="true">
-            <stringProp name="filename">E:/TEC/2021 I Semestre/Bases I/Proyecto/Proyecto2/jmeter/data/node_posts.csv</stringProp>
+            <stringProp name="filename">C:/Users/taylo/OneDrive/Desktop/ChangeIt/jmeter/data/node_posts.csv</stringProp>
             <stringProp name="fileEncoding"></stringProp>
             <stringProp name="variableNames"></stringProp>
             <boolProp name="ignoreFirstLine">false</boolProp>
@@ -484,7 +484,7 @@
           </CSVDataSet>
           <hashTree/>
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Users" enabled="true">
-            <stringProp name="filename">E:/TEC/2021 I Semestre/Bases I/Proyecto/Proyecto2/jmeter/data/users.csv</stringProp>
+            <stringProp name="filename">C:/Users/taylo/OneDrive/Desktop/ChangeIt/jmeter/data/users.csv</stringProp>
             <stringProp name="fileEncoding"></stringProp>
             <stringProp name="variableNames"></stringProp>
             <boolProp name="ignoreFirstLine">false</boolProp>
@@ -496,7 +496,7 @@
           </CSVDataSet>
           <hashTree/>
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Dates" enabled="true">
-            <stringProp name="filename">E:/TEC/2021 I Semestre/Bases I/Proyecto/Proyecto2/jmeter/data/dates.csv</stringProp>
+            <stringProp name="filename">C:/Users/taylo/OneDrive/Desktop/ChangeIt/jmeter/data/dates.csv</stringProp>
             <stringProp name="fileEncoding"></stringProp>
             <stringProp name="variableNames"></stringProp>
             <boolProp name="ignoreFirstLine">false</boolProp>
@@ -508,7 +508,7 @@
           </CSVDataSet>
           <hashTree/>
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Interactions" enabled="true">
-            <stringProp name="filename">E:/TEC/2021 I Semestre/Bases I/Proyecto/Proyecto2/jmeter/data/interactions.csv</stringProp>
+            <stringProp name="filename">C:/Users/taylo/OneDrive/Desktop/ChangeIt/jmeter/data/interactions.csv</stringProp>
             <stringProp name="fileEncoding"></stringProp>
             <stringProp name="variableNames"></stringProp>
             <boolProp name="ignoreFirstLine">false</boolProp>

@@ -355,3 +355,80 @@ BEGIN
 		SET @Cantidad = @Cantidad - 1;
 	END;
 END;
+
+Drop PROCEDURE IF EXISTS sp_fill_Login_sessions;
+
+EXEC sp_fill_Login_sessions 1000
+
+CREATE PROCEDURE sp_fill_Login_sessions
+	@Cantidad INT
+AS 
+BEGIN
+	
+	DECLARE @Max BIGINT;
+	DECLARE @Min BIGINT;
+
+	DECLARE @idUser BIGINT;
+	DECLARE @idSocialM int;
+
+	DECLARE @tokken varbinary;
+	DECLARE @tok_type varchar(128);
+	DECLARE @exp_date datetime;
+
+	Declare @long decimal(11,8)
+	Declare @lat decimal(10,8)
+
+	DECLARE @FromDate date = '2015-01-01';
+	DECLARE @ToDate date = '2019-12-31';
+
+	DECLARE @minLat decimal(10,8) = 38.5558;
+	DECLARE @maxLat decimal(10,8) = 47.882003;
+	DECLARE @minLong decimal(11,8) = -69.63808;
+	DECLARE @maxLong decimal(11,8) = -86.514499;
+
+
+	WHILE @Cantidad > 0
+	BEGIN
+		-- Seleccionamos un user random
+		SELECT
+			@Max = MAX(idUser),
+			@Min = MIN(idUser)
+		FROM dbo.Users;
+
+		SELECT TOP 1
+			@idUser = idUser
+		FROM dbo.Users
+		WHERE idUser >= RAND() * (@Max - @Min) + @Min;
+
+		-- Seleccionamos un Social Media aleatorio
+		SELECT
+			@Max = MAX(idSocialMedia),
+			@Min = MIN(idSocialMedia)
+		FROM dbo.SocialMedia;
+
+		SELECT TOP 1
+			@idSocialM = idSocialMedia
+		FROM dbo.SocialMedia
+		WHERE idSocialMedia >= RAND() * (@Max - @Min) + @Min;
+
+		--Seteamos el Tokken y su tipo 
+		SET @tokken= CAST( rand()* 99999999 AS BINARY(2) ); 
+		SET @tok_type= CONCAT('TokkenType',cast(rand()*99999 as integer))
+
+		-- Obtenemos fechas aleatorias (coherentes con la progra) para obtener un post
+		SELECT @exp_date = CAST(dateadd(day, 
+					   rand(checksum(newid()))*(1+datediff(day, @FromDate, @ToDate)), 
+					   @FromDate) AS DATETIME)
+
+		-- Insertamos el punto desde donde se logueo el user
+		SET @lat= RAND() * (@maxLat - @minLat) + @minLat
+		SET @long= RAND() * (@maxLong - @minLong) + @minLong
+
+		INSERT INTO dbo.LoginSessions
+			(idUser, idSocialMedia, access_token, token_type, expire_date, longitude, latitude)
+		VALUES
+			(@idUser, @idSocialM, @tokken, @tok_type, @exp_date, @long, @lat);
+		SET @Cantidad = @Cantidad - 1;
+	END
+END;
+SELECT * FROM dbo.LoginSessions
